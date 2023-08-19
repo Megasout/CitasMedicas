@@ -6,13 +6,14 @@ import ListadoPacientes from './components/ListadoPacientes'
 
 function App() {
   return (
-    <div className='container mx-auto mt-20'>
+    <div className='container mx-auto'>
       <Header />
-      <div className='mt-12 md:flex'>
+      <div className='my-12 md:flex'>
         <Formulario />
+        <hr className='h-px my-8 bg-gray-600 border-0 mx-3'/>
         <ListadoPacientes />
+        <div className='py-4 md:py-0'/>
       </div>
-
     </div>
   )
 }
