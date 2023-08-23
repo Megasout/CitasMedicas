@@ -1,4 +1,3 @@
-//TODO: agregar a notas useEffect
 import { FormEvent, useState, useEffect } from 'react'
 
 import { PatientData } from '../App'
@@ -7,6 +6,7 @@ import FormFiel from './FormField'
 type FormulalrioProps = {
     addPatient: (patitent: PatientData) => void
     loadedPatient: PatientData
+    setLoadedPatitent: (updatedPatient: PatientData) => void
 }
 
 function Formulario(props: FormulalrioProps) {
@@ -17,7 +17,10 @@ function Formulario(props: FormulalrioProps) {
                 Añade Pacientes y {' '}
                 <span className="text-red-700 font-bold">Administralos</span>
             </p>
-            <Form addPatient = {props.addPatient} loadedPatient={props.loadedPatient} />
+            <Form
+                addPatient={props.addPatient}
+                loadedPatient={props.loadedPatient}
+                setLoadedPatitent={props.setLoadedPatitent} />
         </div>
     )
 }
@@ -47,10 +50,11 @@ function Form(prop: FormulalrioProps) {
         return { ...error, value: value }
     }
 
-    //TODO: use effect sirve para evitar que algo se recalcule en cada re render
-    //en este caso solo se ejecutara lo que esta dentro cuando loadedPatient cambie
     useEffect(() => {
-        setPatient(prop.loadedPatient)
+        if (Object.keys(prop.loadedPatient).length > 0) {
+            setPatient(prop.loadedPatient)
+        }
+
     }, [prop.loadedPatient])
 
     const handleOnSubmit = (e: FormEvent) => {
@@ -70,15 +74,20 @@ function Form(prop: FormulalrioProps) {
         }
         //Fin de validacion
 
-        prop.addPatient(patientData)
+        if(!patientData.id)
+            prop.addPatient(patientData)
+        else
+            prop.setLoadedPatitent(patientData)
+
         setPatient({
-            name: undefined,
-            lastName: undefined,
-            date: undefined,
-            email: undefined,
-            comment: undefined
+            id: '',
+            name: '',
+            lastName: '',
+            date: '',
+            email: '',
+            comment: ''
         })
-        return setError(errorT)
+        setError(errorT)
     }
 
     return (
@@ -126,7 +135,7 @@ function Form(prop: FormulalrioProps) {
                     type="submit"
                     className="bg-purple-500 w-full p-3 text-white uppercase font-bold hover:bg-purple-600 
                 cursor-pointer transition-colors"
-                    value="Enviar Paciente"
+                    value={patientData.id ? 'Editar Paciente' : 'Agregar Paciente'}
                 />
             </form>
         </>

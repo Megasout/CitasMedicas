@@ -4,32 +4,17 @@ import Paciente from "./Paciente"
 type ListadoPacientesProps = {
     patients: PatientData[]
     onLoadedPatient: (patient: PatientData) => void
+    deletePatient: (id: string) => void
 }
 
 function ListadoPacientes(props: ListadoPacientesProps) {
 
-    // TODO: agregar a apuntes que los elementos lista de auto contruccion como este nesecitan una key
-    // y que puedo obtener desde el map el indice en el que me encuentro
-
-    //Esto funciona pero es una mala practica que afecta el performance
-    // const items = props.patients.map((patient, index) => (
-    //     <Paciente key={index} patients={patient}/>
-    // ))
-
-    //Aun asi esto puede repetirse si dos usuarios ingresan datos a la vez 
-    //aunque la probabilidad es minima pero como no tenemos BD
-    //para probar si existe o no por ahora esto deberia de funcionar
-    const generaId = (): string => {
-        //Esto generara un numero aleatorio quitando los 2 primeros caracteres
-        const random = Math.random().toString(36).substring(2)
-        //Esto obtiene la fecha de hoy en milisegundos
-        const fecha = Date.now().toString(36)
-
-        return fecha + random
-    }
-
     const items = props.patients.map((patient) => (
-        <Paciente key={generaId()} patients={patient} onLoadedPatient={props.onLoadedPatient} />
+        <Paciente
+            key={patient.id}
+            patients={patient}
+            onLoadedPatient={props.onLoadedPatient}
+            deletePatient={props.deletePatient} />
     ))
 
     const title = (props.patients.length > 0) ? 'Listado de Pacientes' : 'No hay pacientes'

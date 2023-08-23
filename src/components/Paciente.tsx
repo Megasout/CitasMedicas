@@ -3,13 +3,20 @@ import { PatientData } from "../App"
 type PacienteProps = {
     patients: PatientData
     onLoadedPatient: (patient: PatientData) => void
+    deletePatient: (id: string) => void
 }
 
 function Paciente(props: PacienteProps) {
-    // TODO: Agregar a notas de TypeScript: esto es para no tener que poner prop.patines.name por ejemplo 
-    const {name, lastName, email, date, comment} = props.patients
+    const { name, lastName, email, date, comment } = props.patients
 
-    const handleEddit = () => props.onLoadedPatient(props.patients)
+    const handleEdit = () => props.onLoadedPatient(props.patients)
+    const handleDelete = () => {
+        const respuesta = confirm('Deseas eliminar este paciente?')
+
+        if (respuesta)
+            props.deletePatient(props.patients.id as string)
+    }
+
 
     return (
         <div className="mb-5 bg-white shadow-md px-5 py-5 rounded-md md:mr-3">
@@ -22,9 +29,10 @@ function Paciente(props: PacienteProps) {
 
             <div className="flex justify-end">
                 <button className="bg-purple-500 hover:bg-purple-600 transition-colors text-white py-1 w-[100px] mr-3"
-                onClick={handleEddit}>
+                    onClick={handleEdit}>
                     Editar</button>
-                <button className="bg-red-600 hover:bg-red-700 transition-colors text-white py-1 w-[100px]">
+                <button className="bg-red-600 hover:bg-red-700 transition-colors text-white py-1 w-[100px]"
+                    onClick={handleDelete}>
                     Eliminar</button>
             </div>
         </div>

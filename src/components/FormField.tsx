@@ -43,7 +43,6 @@ function FormFiel(formData: FormData): JSX.Element {
 
 export default FormFiel
 
-// TODO: Anotar este tipo de children en mis apuntes
 interface ErrorMessageProps {
     children: React.ReactNode
 }
