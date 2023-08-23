@@ -1,4 +1,15 @@
-function Formulario() {
+//TODO: agregar a notas useEffect
+import { FormEvent, useState, useEffect } from 'react'
+
+import { PatientData } from '../App'
+import FormFiel from './FormField'
+
+type FormulalrioProps = {
+    addPatient: (patitent: PatientData) => void
+    loadedPatient: PatientData
+}
+
+function Formulario(props: FormulalrioProps) {
     return (
         <div className="md:w-1/2 lg:w-2/5 mb-10">
             <h2 className="font-black text-3xl text-center">Seguimiento de Pacientes</h2>
@@ -6,64 +17,118 @@ function Formulario() {
                 Añade Pacientes y {' '}
                 <span className="text-red-700 font-bold">Administralos</span>
             </p>
-            {form()}
+            <Form addPatient = {props.addPatient} loadedPatient={props.loadedPatient} />
         </div>
     )
 }
 
 export default Formulario
 
-function form() {
+export type ErrorType = {
+    value: boolean
+    message: string
+}
+
+interface ErrorsDictionary {
+    [id: string]: ErrorType
+}
+
+function Form(prop: FormulalrioProps) {
+    const [patientData, setPatient] = useState<PatientData>({})
+
+    const [error, setError] = useState<ErrorsDictionary>({
+        'name': { value: false, message: 'El campo nombre esta vacio' },
+        'lastName': { value: false, message: 'El campo apellido esta vacio' },
+        'email': { value: false, message: 'El campo email esta vacio' },
+        'date': { value: false, message: 'El campo fecha esta vacio' }
+    })
+
+    const setValueError = (error: ErrorType, value: boolean): ErrorType => {
+        return { ...error, value: value }
+    }
+
+    //TODO: use effect sirve para evitar que algo se recalcule en cada re render
+    //en este caso solo se ejecutara lo que esta dentro cuando loadedPatient cambie
+    useEffect(() => {
+        setPatient(prop.loadedPatient)
+    }, [prop.loadedPatient])
+
+    const handleOnSubmit = (e: FormEvent) => {
+        e.preventDefault()
+
+        let errorT: ErrorsDictionary = { ...error }
+
+        //Validacion del Formulario
+        errorT['name'] = setValueError(errorT['name'], !patientData.name || patientData.name == (''))
+        errorT['lastName'] = setValueError(errorT['lastName'], !patientData.lastName || patientData.lastName == (''))
+        errorT['email'] = setValueError(errorT['email'], !patientData.email || patientData.email == (''))
+        errorT['date'] = setValueError(errorT['date'], !patientData.date)
+
+        for (const key in errorT) {
+            if (errorT[key].value)
+                return setError(errorT)
+        }
+        //Fin de validacion
+
+        prop.addPatient(patientData)
+        setPatient({
+            name: undefined,
+            lastName: undefined,
+            date: undefined,
+            email: undefined,
+            comment: undefined
+        })
+        return setError(errorT)
+    }
+
     return (
-        <form className="bg-white py-7 px-5">
-            {formFiel({ id: 'ff1', formName: 'Nombre', formPlaceHolder: 'Nombre del Paciente' })}
-            {formFiel({ id: 'ff2', formName: 'Apellido', formPlaceHolder: 'Apellido del Paciente' })}
-            {formFiel({ id: 'ff3', formName: 'Email', inputType: "email", formPlaceHolder: 'email@gmail.com' })}
-            {formFiel({ id: 'ff4', formName: 'Fecha', inputType: "date" })}
-            <div className="mb-5">
-                <label htmlFor='ff5' className="block font-bold text-gray-400">
-                    <span className="text-gray-700 uppercase font-bold">Comentario </span>
-                    (Opcional)
-                </label>
-                <textarea
-                    id="ff5"
-                    className="border-2 w-full placeholder-gray-400 rounded-md CustomScrollBar"
-                    placeholder="Describe los sintomas o razon de cita"
-                />
-            </div>
-            <input
-                type="submit"
-                className="bg-purple-500 w-full p-3 text-white uppercase font-bold hover:bg-purple-600 
+        <>
+            <form onSubmit={handleOnSubmit} className="bg-white py-7 px-5">
+                <FormFiel id='ff1'
+                    value={patientData.name}
+                    onChange={(newValue) => setPatient({ ...patientData, name: newValue as (String & undefined) })}
+                    error={error['name']}
+                    formName='Nombre'
+                    formPlaceHolder='Nombre del Paciente' />
+                <FormFiel id='ff2'
+                    value={patientData.lastName}
+                    onChange={(newValue) => setPatient({ ...patientData, lastName: newValue as (String & undefined) })}
+                    error={error['lastName']}
+                    formName='Apellido'
+                    formPlaceHolder='Apellido del Paciente' />
+                <FormFiel id='ff3'
+                    value={patientData.email}
+                    onChange={(newValue) => setPatient({ ...patientData, email: newValue as (String & undefined) })}
+                    error={error['email']}
+                    formName='Email'
+                    inputType="email"
+                    formPlaceHolder='email@gmail.com' />
+                <FormFiel id='ff4'
+                    value={patientData.date}
+                    onChange={(newValue) => setPatient({ ...patientData, date: newValue as (Date & undefined) })}
+                    error={error['date']}
+                    formName='Fecha'
+                    inputType="date" />
+                <div className="mb-5">
+                    <label htmlFor='ff5' className="block font-bold text-gray-400">
+                        <span className="text-gray-700 uppercase font-bold">Comentario </span>
+                        (Opcional)
+                    </label>
+                    <textarea
+                        id="ff5"
+                        value={patientData.comment}
+                        onChange={(event) => setPatient({ ...patientData, comment: event.target.value })}
+                        className="border-2 w-full placeholder-gray-400 rounded-md CustomScrollBar"
+                        placeholder="Describe los sintomas o razon de cita"
+                    />
+                </div>
+                <input
+                    type="submit"
+                    className="bg-purple-500 w-full p-3 text-white uppercase font-bold hover:bg-purple-600 
                 cursor-pointer transition-colors"
-                value="Enviar Paciente"
-            />
-        </form>
+                    value="Enviar Paciente"
+                />
+            </form>
+        </>
     )
 }
-
-type FormData = {
-    id: string,
-    formName: string,
-    formPlaceHolder?: string
-    inputType?: React.HTMLInputTypeAttribute
-}
-
-function formFiel(formData: FormData): JSX.Element {
-    let inputType: React.HTMLInputTypeAttribute = "text";
-
-    if (formData.inputType)
-        inputType = formData.inputType
-
-    return (
-        <div className="mb-5">
-            <label htmlFor={formData.id}
-                className="block text-gray-700 uppercase font-bold">{formData.formName}</label>
-            <input
-                id={formData.id}
-                className="border-2 w-full placeholder-gray-400 rounded-md"
-                type={inputType}
-                placeholder={formData.formPlaceHolder}></input>
-        </div>
-    )
-}
-
