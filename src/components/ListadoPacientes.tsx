@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import { PatientData } from "../App"
 import Paciente from "./Paciente"
 
@@ -33,10 +32,6 @@ function ListadoPacientes(props: ListadoPacientesProps) {
         <Paciente key={generaId()} patients={patient} onLoadedPatient={props.onLoadedPatient} />
     ))
 
-    useEffect(()=>{
-        console.log("nuevo paciente")
-    }, [props.patients])
-    
     const title = (props.patients.length > 0) ? 'Listado de Pacientes' : 'No hay pacientes'
 
     return (
